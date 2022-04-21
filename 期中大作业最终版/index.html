@@ -1,0 +1,691 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        #chart-panel1 {
+            position: absolute;
+            left: 37.5%;
+            top: 10%;
+            width: 35%;
+            height: 88%;
+        }
+
+        #chart-panel2 {
+            position: absolute;
+            left: 0%;
+            top: 50%;
+            width: 37.5%;
+            height: 49%;
+        }
+
+        #chart-panel3 {
+            position: absolute;
+            left: 0%;
+            top: 10%;
+            width: 37.5%;
+            height: 39%;
+        }
+
+        #chart-panel4 {
+            position: absolute;
+            right: 0%;
+            top: 10%;
+            width: 27.5%;
+            height: 88%;
+        }
+
+        #title_container {
+            height: 10%;
+            width: 100%;
+            top: 0;
+            font-size: 6vh;
+            color: rgb(0, 200, 255);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        body {
+            background-color: black;
+        }
+
+        .border-container {
+            box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.2), 0 0 8px rgba(209, 201, 255, 0.8)
+        }
+
+        .border-container:hover {
+            box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.2), 0 0 30px rgba(114, 250, 255, 0.8)
+        }
+    </style>
+    <script src="echarts.min.js"></script>
+    <!-- <script src="jquery.min.js"></script> -->
+    <script src='echarts-wordcloud.min.js'></script>
+
+</head>
+
+
+<body>
+    <div id="title_container" class="border-container">2021年浙传毕业生数据一览</div>
+    <div id="chart-panel1" class="border-container"></div>
+    <div id="chart-panel2" class="border-container"></div>
+    <div id="chart-panel3" class="border-container"></div>
+    <div id="chart-panel4" class="border-container"></div>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <script type="text/javascript">
+
+
+
+        // 基于准备好的dom，初始化echarts实例
+        var myChart_center = echarts.init(document.getElementById('chart-panel1'));
+        var myChart_left = echarts.init(document.getElementById('chart-panel2'));
+        var myChart_left_top = echarts.init(document.getElementById('chart-panel3'));
+        var myChart_right = echarts.init(document.getElementById('chart-panel4'));
+        var option_left = {};
+
+
+
+
+
+
+
+        option_left_top = {
+            tooltip: {
+                trigger: 'item'
+            },
+            title: {
+                text: "某学院某专业就业分布",
+                left: "50%",
+                top: "10",
+                textAlign: "center",
+                textStyle: {
+                    color: "rgb(0, 200, 255)",
+                    fontWeight: "normal",
+                },
+            },
+            legend: {
+                top: '15%',
+                left: 'center',
+                textStyle: {//图例文字的样式
+                    color: '#ccc',
+                    fontSize: 16
+                }
+            },
+            series: [
+                {
+                    name: 'Access From',
+                    top: 50,
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#000',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '40',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: true
+                    },
+                    data: [
+                        { value: 20, name: '签就业协议' },
+                        { value: 32, name: '签劳动合同' },
+                        { value: 1, name: '公务员' },
+                        { value: 1, name: '其他录用' },
+                        { value: 1, name: '征兵入伍' },
+                        { value: 1, name: '基层项目' },
+                        { value: 2, name: '自由职业' },
+                        { value: 1, name: '国内升学' },
+                        { value: 3, name: '出国(境)' },
+                    ]
+                }
+            ]
+        };
+        myChart_left_top.setOption(option_left_top);
+
+
+
+
+
+
+
+
+
+
+
+
+        function draw(item) {
+            console.log(item);
+            var j = 0;
+            var data = [];
+            for (var i in item) {
+                if (i == "公务员" || i == "事业单位" || i == "其他录用" || i == "征兵入伍" || i == "基层项目" || i == "自主创业" || i == "自由职业" || i == "国内升学" || i == "出国(境)") {
+                    var num = parseInt(item[i]);
+                    data.push({ value: num, name: i });
+                }
+            }
+            option_left_top.series[0].data = data;
+            option_left_top.title.text = item["学院"] + item["专业"] + "专业就业分布";
+            myChart_left_top.setOption(option_left_top);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function draw_left_down(dict, name) {
+            var data = [];
+            for (var key in dict) {
+                data.push({ value: dict[key], name: key });
+            }
+            option_left.series[0].data = data;
+            option_left.title.text = "2021年" + name + "就业分布情况";
+            console.log(dict);
+            myChart_left.setOption(option_left);
+        }
+
+
+
+
+
+
+
+
+        var pokemon_json_temp;
+        function clickFun(param) {
+            if (param.type == 'click') {
+                var dict = {};
+                var flag = false;
+                for (var i in pokemon_json_temp) {
+                    if (pokemon_json_temp[i]["学院"] == param.name) {
+                        for (var key in pokemon_json_temp[i]) {
+                            if (key == "公务员" || key == "事业单位" || key == "其他录用" || key == "征兵入伍" || key == "基层项目" || key == "自主创业" || key == "自由职业" || key == "国内升学" || key == "出国(境)") {
+                                if (dict[key]) {
+                                    flag = true;
+                                    dict[key] += parseInt(pokemon_json_temp[i][key]);
+                                }
+                                else dict[key] = parseInt(pokemon_json_temp[i][key]);
+                            }
+                        }
+                    }
+                }
+
+                if (flag)
+                    draw_left_down(dict, param.name);
+            }
+            if (param.type == 'click') {
+                var j;
+                for (var i in pokemon_json_temp) {
+                    // console.log(pokemon);
+                    // console.log(param.name);
+                    if (pokemon_json_temp[i]["专业"] == param.name) {
+                        var data = pokemon_json_temp[i];
+                        // console.log(data);
+                        j = pokemon_json_temp[i]["学院"];
+                        draw(data);
+                        break;
+                    }
+                }
+                var dict = {};
+                var flag = false;
+                for (var i in pokemon_json_temp) {
+                    if (pokemon_json_temp[i]["学院"] == j) {
+                        for (var key in pokemon_json_temp[i]) {
+                            if (key == "公务员" || key == "事业单位" || key == "其他录用" || key == "征兵入伍" || key == "基层项目" || key == "自主创业" || key == "自由职业" || key == "国内升学" || key == "出国(境)") {
+                                if (dict[key]) {
+                                    flag = true;
+                                    dict[key] += parseInt(pokemon_json_temp[i][key]);
+                                }
+                                else dict[key] = parseInt(pokemon_json_temp[i][key]);
+                            }
+                        }
+                    }
+                }
+                if (flag)
+                    draw_left_down(dict, j);
+            }
+        }
+
+
+
+
+
+
+
+
+        window.onload = function () {
+            var url1 = "data.json"/*json文件url，本地的就写本地的位置，如果是服务器的就写服务器的路径*/
+            var request1 = new XMLHttpRequest();
+            request1.open("get", url1);/*设置请求方法与路径*/
+            request1.send(null);/*不发送数据到服务器*/
+            request1.onload = function () {/*XHR对象获取到返回信息后执行*/
+                if (request1.status == 200) {/*返回状态为200，即为数据获取成功*/
+                    var region_json = JSON.parse(request1.responseText);
+                    pokemon_json_temp = region_json;
+
+
+
+                    var colors = [
+                        "#00ADD0",
+                        "#FFA12F",
+                        "#B62AFF",
+                        "#604BFF",
+                        "#6E35FF",
+                        "#002AFF",
+                        "#20C0F4",
+                        "#95F300",
+                        "#04FDB8",
+                        "#AF5AFF"
+                    ];
+
+                    var getdata = function getData() {
+
+
+
+
+                        let data = {
+                            name: "学院",
+                            children: []
+                        };
+                        // console.log(region_json);
+                        var last = {};
+                        var lastobj = {};
+                        var flag = false;
+                        for (var i in region_json) {
+                            // console.log(region_json[i]);
+                            if (last["学院"] == region_json[i]["学院"]) {
+                                let obj2 = {
+                                    name: region_json[i]['专业'],
+                                };
+                                lastobj.children.push(obj2);
+                            }
+                            else {
+                                if (flag) data.children.push(lastobj);
+                                if (flag == false) {
+                                    flag = true;
+                                }
+                                let obj = {
+                                    name: region_json[i]["学院"],
+                                    collapsed: true,
+                                    children: [],
+                                };
+                                lastobj = obj;
+                                let obj2 = {
+                                    name: region_json[i]['专业'],
+                                };
+                                lastobj.children.push(obj2);
+                            }
+                            last = region_json[i];
+                        }
+                        data.children.push(lastobj);
+                        let arr = []
+                        arr.push(data);
+                        arr = handle(arr, 0)
+                        return arr;
+                    }
+
+
+
+
+
+
+                    var handle = function handleData(data, index, color = '#00f6ff') {
+                        //index标识第几层
+                        return data.map((item, index2) => {
+                            //计算出颜色
+                            if (index == 1) {
+                                color = colors.find((item, eq) => eq == index2 % 10);
+                            }
+                            // 设置节点大小
+                            if (index === 0 || index === 1) {
+                                item.label = {
+                                    position: "inside",
+                                    //   rotate: 0,
+                                    //   borderRadius: "50%",
+                                }
+                            }
+                            // 设置label大小
+                            switch (index) {
+                                case 0:
+                                    item.symbolSize = 70
+                                    break;
+                                case 1:
+                                    item.symbolSize = 40
+                                    break;
+                                default:
+                                    item.symbolSize = 20
+                                    break;
+                            }
+                            // 设置线条颜色
+                            item.lineStyle = { color: color }
+
+                            if (item.children) {//存在子节点
+                                item.itemStyle = {
+                                    borderColor: color,
+                                    color: color
+                                };
+                                item.children = handle(item.children, index + 1, color)
+                            } else {//不存在
+                                item.itemStyle = {
+                                    color: 'transparent',
+                                    borderColor: color
+                                };
+                            }
+                            return item;
+                        })
+                    }
+
+                    var option_center = {
+                        type: "tree",
+                        backgroundColor: "#000",
+                        toolbox: { //工具栏
+                            show: true,
+                            iconStyle: {
+                                borderColor: "#03ceda"
+                            },
+                            feature: {
+                                restore: {}
+                            }
+                        },
+
+                        title: {
+                            text: "学院分布情况",
+                            left: "50%",
+                            top: "30",
+                            textAlign: "center",
+                            textStyle: {
+                                color: "rgb(0, 200, 255)",
+                                fontWeight: "normal",
+                            },
+                        },
+                        tooltip: {//提示框
+                            trigger: "item",
+                            triggerOn: "mousemove",
+                            backgroundColor: "rgba(1,70,86,1)",
+                            borderColor: "rgba(0,246,255,1)",
+                            borderWidth: 0.5,
+                            textStyle: {
+                                fontSize: 10
+                            }
+                        },
+                        series: [
+                            {
+                                type: "tree",
+                                hoverAnimation: true, //hover样式
+                                data: getdata(),
+                                top: 80,
+                                bottom: 50,
+                                left: 50,
+                                right: 50,
+                                layout: "radial",
+                                symbol: "circle",
+                                symbolSize: 10,
+                                nodePadding: 20,
+                                animationDurationUpdate: 750,
+                                expandAndCollapse: true, //子树折叠和展开的交互，默认打开
+                                initialTreeDepth: 2,
+                                roam: true, //是否开启鼠标缩放和平移漫游。scale/move/true
+                                focusNodeAdjacency: true,
+                                itemStyle: {
+                                    borderWidth: 1,
+                                },
+                                label: { //标签样式
+                                    color: "#fff",
+                                    fontSize: 10,
+                                    fontFamily: "SourceHanSansCN",
+                                    position: "inside",
+                                    rotate: 0,
+                                },
+                                lineStyle: {
+                                    width: 1,
+                                    curveness: 0.5,
+                                }
+                            }
+                        ]
+                    };
+                    if (option_center) {
+                        myChart_center.on("click", clickFun);
+                        myChart_center.setOption(option_center);
+                    }
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            data = [
+                {
+                    value: 1093,
+                    name: "文化,体育和娱乐",
+                },
+                {
+                    value: 581,
+                    name: "信息传输、软件和信息技术服务",
+                },
+                {
+                    value: 274,
+                    name: "租赁和商务服务业",
+                },
+                {
+                    value: 192,
+                    name: "教育",
+                },
+                {
+                    value: 189,
+                    name: "批发和零售业",
+                },
+                {
+                    value: 89,
+                    name: "科学研究和技术服务行业",
+                },
+                {
+                    value: 67,
+                    name: "制造业",
+                },
+                {
+                    value: 67,
+                    name: "公共管理和社会保障",
+                },
+                {
+                    value: 232,
+                    name: "其他",
+                }
+            ];
+
+
+            option_left = {
+                // backgroundColor: "#000",
+                title: {
+                    text: "2021某学院毕业生分布",
+                    left: "50%",
+                    top: "30",
+                    textAlign: "center",
+                    textStyle: {
+                        color: "rgb(0, 200, 255)",
+                        fontWeight: "normal",
+                    },
+                },
+                tooltip: {
+                    trigger: "item",
+                    formatter: "{b}",
+                },
+                series: [
+                    {
+                        type: "treemap",
+                        width: "100%",
+                        height: "85%",
+                        top: "15%",
+                        roam: false, //是否开启拖拽漫游（移动和缩放）
+                        nodeClick: false, //点击节点后的行为,false无反应
+                        breadcrumb: {
+                            show: false,
+                        },
+                        label: {
+                            //描述了每个矩形中，文本标签的样式。
+                            normal: {
+                                show: true,
+                                position: ["10%", "40%"],
+                            },
+                        },
+                        itemStyle: {
+                            normal: {
+                                show: true,
+                                textStyle: {
+                                    color: "#fff",
+                                    fontSize: 16,
+                                },
+                                borderWidth: 1,
+                                borderColor: "#fff",
+                            },
+
+                            emphasis: {
+                                label: {
+                                    show: true,
+                                },
+                            },
+                        },
+                        data: data,
+                    },
+                ],
+            };
+
+
+            if (option_left) {
+                myChart_left.setOption(option_left);
+            }
+
+
+
+
+            data_rank = [238, 109, 251, 230, 239, 292, 239, 302, 290, 283, 202];
+
+            option_right = {
+                backgroundColor: '#000000',
+                tooltip: {
+                    trigger: 'axis',
+                    show: true,
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    },
+                },
+                title: {
+                    text: "2021年浙江传媒学院各学院毕业人数",
+                    left: "50%",
+                    top: "30",
+                    textAlign: "center",
+                    textStyle: {
+                        color: "rgb(0, 200, 255)",
+                        fontWeight: "normal",
+                    },
+                },
+                legend: {
+                    show: false
+                },
+                grid: {
+                    left: '10%',
+                    right: '10%',
+                    bottom: '10%',
+                    containLabel: true
+                },
+                xAxis: [{
+                    splitLine: {
+                        show: false
+                    },
+                    type: 'value',
+                    show: false,
+                }],
+                yAxis: [{
+                    splitLine: {
+                        show: false
+                    },
+                    axisLine: { //y轴
+                        show: false
+                    },
+                    type: 'category',
+                    axisTick: {
+                        show: false
+                    },
+                    inverse: true,
+                    data: ['音乐学院', '播音主持艺术学院', '华策电影学院', '动画学院', '管理学院', '国际文化传播学院', '设计艺术学院', '文化创意学院', '文学院', '新闻与传播学院', '新媒体学院'],
+                    axisLabel: {
+                        color: '#ffffff',
+                        fontSize: 14,
+                    }
+                }],
+                series: [{
+                    name: '毕业人数',
+                    type: 'bar',
+                    barWidth: 8, // 柱子宽度
+                    label: {
+                        show: true,
+                        position: 'right', // 位置
+                        color: '#ffffff',
+                        fontSize: 14,
+                        distance: 15, // 距离
+                        formatter: '{c} 人' // 这里是数据展示的时候显示的数据
+                    }, // 柱子上方的数值
+                    itemStyle: {
+                        barBorderRadius: [0, 0, 0, 0], // 圆角（左上、右上、右下、左下）
+
+                        color: '#419fff'
+                    },
+                    data: data_rank.sort()
+                },]
+            };
+
+            myChart_right.setOption(option_right);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>
